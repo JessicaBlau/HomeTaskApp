@@ -35,7 +35,13 @@ function LoginForm() {
       options: { emailRedirectTo: `${location.origin}/auth/callback` },
     })
 
-    if (error) { setError(error.message) }
+    if (error) {
+      const msg = error.message.toLowerCase()
+      if (msg.includes('rate limit') || msg.includes('too many'))
+        setError('Too many attempts — please wait a few minutes and try again.')
+      else
+        setError(error.message)
+    }
     else       { setSent(true) }
     setLoading(false)
   }
