@@ -2,13 +2,23 @@
 // app/(auth)/login/page.tsx
 // Magic-link login — generic for any household member.
 
-import { useState }     from 'react'
-import { useRouter }    from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export default function LoginPage() {
-  const router   = useRouter()
-  const supabase = createClient()
+const ERROR_MESSAGES: Record<string, string> = {
+  otp_expired:  'That link has expired — request a new one below.',
+  access_denied:'That link is no longer valid — request a new one below.',
+  auth_failed:  'Sign-in failed — please try again.',
+}
+
+function LoginForm() {
+  const router       = useRouter()
+  const supabase     = createClient()
+  const searchParams = useSearchParams()
+
+  const urlErrorCode = searchParams.get('error') ?? ''
+  const urlErrorMsg  = ERROR_MESSAGES[urlErrorCode] ?? (urlErrorCode ? 'Sign-in failed — please try again.' : '')
 
   const [email,   setEmail]   = useState('')
   const [sent,    setSent]    = useState(false)
@@ -62,11 +72,21 @@ export default function LoginPage() {
                 autoFocus
               />
             </div>
+
+            {/* URL-sourced error (e.g. expired link) */}
+            {urlErrorMsg && !error && (
+              <p style={{ color: '#C45A5A', fontSize: '0.8rem', marginBottom: 8 }}>
+                ⚠️ {urlErrorMsg}
+              </p>
+            )}
+
+            {/* Form-level error */}
             {error && (
               <p style={{ color: '#C45A5A', fontSize: '0.8rem', marginBottom: 8 }}>
                 {error}
               </p>
             )}
+
             <button className="login-btn" type="submit" disabled={loading}>
               {loading ? 'Sending…' : 'Send magic link →'}
             </button>
@@ -83,5 +103,13 @@ export default function LoginPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }
