@@ -1517,3 +1517,208 @@ body {
   color:      var(--ink-muted);
 }
 .invite-revoke-btn:hover { background: var(--surface-3); }
+
+/* ═══════════════════════════════════════════
+   TASK MENU (••• button + dropdown)
+═══════════════════════════════════════════ */
+.task-menu-wrap {
+  position: relative;
+}
+
+.task-menu-btn {
+  background:  none;
+  border:      none;
+  cursor:      pointer;
+  font-size:   0.7rem;
+  color:       var(--ink-faint);
+  padding:     4px 6px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.05em;
+  transition:  background var(--duration-fast) var(--ease-out),
+               color    var(--duration-fast) var(--ease-out);
+}
+.task-menu-btn:hover { background: var(--surface-2); color: var(--ink-muted); }
+
+.task-menu-dropdown {
+  position:   absolute;
+  top:        calc(100% + 4px);
+  right:      0;
+  background: var(--surface);
+  border:     1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  min-width:  130px;
+  z-index:    50;
+  overflow:   hidden;
+}
+
+.task-menu-item {
+  display:    block;
+  width:      100%;
+  text-align: left;
+  background: none;
+  border:     none;
+  padding:    var(--space-2) var(--space-4);
+  font-size:  0.84rem;
+  color:      var(--ink);
+  cursor:     pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+.task-menu-item:hover       { background: var(--surface-2); }
+.task-menu-item.danger      { color: #C45A5A; }
+.task-menu-item.danger:hover{ background: #FEF0EE; }
+
+/* ═══════════════════════════════════════════
+   EDIT TASK MODAL (bottom sheet)
+═══════════════════════════════════════════ */
+.modal-backdrop {
+  position:   fixed;
+  inset:      0;
+  background: rgba(0,0,0,0.35);
+  z-index:    100;
+  animation:  fadeIn var(--duration-base) var(--ease-out);
+}
+
+.modal-sheet {
+  position:   fixed;
+  left:       0;
+  right:      0;
+  bottom:     0;
+  background: var(--surface);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  z-index:    101;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+  animation:  slideUp var(--duration-base) var(--ease-out);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modal-handle {
+  width:        40px;
+  height:       4px;
+  background:   var(--border);
+  border-radius: 2px;
+  margin:       var(--space-3) auto var(--space-1);
+}
+
+.modal-header {
+  display:     flex;
+  align-items: center;
+  justify-content: space-between;
+  padding:     var(--space-3) var(--space-5) var(--space-2);
+}
+
+.modal-title {
+  font-weight: 700;
+  font-size:   1rem;
+  color:       var(--ink);
+}
+
+.modal-close {
+  background:    none;
+  border:        none;
+  cursor:        pointer;
+  font-size:     1rem;
+  color:         var(--ink-faint);
+  padding:       4px 8px;
+  border-radius: var(--radius-sm);
+}
+.modal-close:hover { background: var(--surface-2); }
+
+.modal-body {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-5);
+  padding:        var(--space-3) var(--space-5) var(--space-6);
+}
+
+.modal-field {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-2);
+}
+
+.modal-label {
+  font-family: var(--font-mono);
+  font-size:   0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color:       var(--ink-muted);
+}
+.modal-label-hint { text-transform: none; color: var(--ink-faint); }
+
+.modal-input {
+  background:    var(--surface-2);
+  border:        1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding:       var(--space-3) var(--space-4);
+  font-size:     0.9rem;
+  color:         var(--ink);
+  font-family:   var(--font-sans);
+  outline:       none;
+  transition:    border-color var(--duration-fast) var(--ease-out);
+}
+.modal-input:focus { border-color: var(--ink-muted); }
+
+/* Emoji grid */
+.emoji-grid {
+  display:               grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap:                   4px;
+}
+
+.emoji-btn {
+  background:    none;
+  border:        2px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size:     1.2rem;
+  cursor:        pointer;
+  padding:       4px;
+  text-align:    center;
+  transition:    border-color var(--duration-fast) var(--ease-out),
+                 background   var(--duration-fast) var(--ease-out);
+}
+.emoji-btn:hover  { background: var(--surface-2); }
+.emoji-btn.active { border-color: var(--ink-muted); background: var(--surface-2); }
+
+/* Frequency pills */
+.freq-pill-row {
+  display:   flex;
+  flex-wrap: wrap;
+  gap:       var(--space-2);
+}
+
+.freq-pill {
+  background:    var(--surface-2);
+  border:        1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding:       5px var(--space-3);
+  font-size:     0.78rem;
+  color:         var(--ink-muted);
+  cursor:        pointer;
+  transition:    background var(--duration-fast) var(--ease-out),
+                 color      var(--duration-fast) var(--ease-out),
+                 border-color var(--duration-fast) var(--ease-out);
+}
+.freq-pill:hover  { background: var(--surface-3); }
+.freq-pill.active { background: var(--ink); color: white; border-color: var(--ink); }
+
+/* Save button */
+.modal-save-btn {
+  background:    var(--ink);
+  color:         white;
+  border:        none;
+  border-radius: var(--radius-lg);
+  padding:       var(--space-4);
+  font-size:     0.9rem;
+  font-weight:   600;
+  cursor:        pointer;
+  transition:    opacity var(--duration-fast) var(--ease-out);
+}
+.modal-save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.modal-save-btn:hover:not(:disabled) { opacity: 0.85; }

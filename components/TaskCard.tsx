@@ -1,22 +1,25 @@
 'use client'
 // components/TaskCard.tsx
 // Expandable card — task header + collapsible subtask panel.
-// Uses a `color` hex prop for accents (border, freq tag) instead of owner-name CSS classes.
+// Adults get a ••• menu with Edit and Delete actions.
 
-import { useState }        from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { SubtaskItem }     from '@/components/SubtaskItem'
 import { AddRow }          from '@/components/AddRow'
 import type { TaskWithSubtasks } from '@/lib/supabase/types'
 
 interface TaskCardProps {
-  task:          TaskWithSubtasks
-  color:         string              // hex from profile or '#6A9060' for together
-  profiles:      Record<string, string>
-  currentUserId: string
-  onCheck:       (id: string, checked: boolean) => void
-  onAdd:         (taskId: string, text: string) => void
-  onEdit:        (id: string, text: string) => void
-  onDelete:      (id: string) => void
+  task:           TaskWithSubtasks
+  color:          string              // hex from profile or '#6A9060' for together
+  profiles:       Record<string, string>
+  currentUserId:  string
+  isAdult:        boolean
+  onCheck:        (id: string, checked: boolean) => void
+  onAdd:          (taskId: string, text: string) => void
+  onEdit:         (id: string, text: string) => void          // subtask edit
+  onDelete:       (id: string) => void                        // subtask delete
+  onEditTask:     (taskId: string) => void
+  onDeleteTask:   (taskId: string) => void
 }
 
 /** Light tint: color at ~12% opacity for freq tag background */
@@ -28,13 +31,27 @@ function tint(hex: string) {
 }
 
 export function TaskCard({
-  task, color, profiles, currentUserId,
-  onCheck, onAdd, onEdit, onDelete,
+  task, color, profiles, currentUserId, isAdult,
+  onCheck, onAdd, onEdit, onDelete, onEditTask, onDeleteTask,
 }: TaskCardProps) {
-  const [open, setOpen] = useState(false)
+  const [open,     setOpen]     = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef                 = useRef<HTMLDivElement>(null)
 
   const done  = task.subtasks.filter(s => s.checked).length
   const total = task.subtasks.length
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return
+    function handler(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [menuOpen])
 
   return (
     <div
@@ -75,6 +92,40 @@ export function TaskCard({
               {done}/{total}
             </span>
           )}
+
+          {/* ••• menu — adults only */}
+          {isAdult && (
+            <div
+              className="task-menu-wrap"
+              ref={menuRef}
+              onClick={e => e.stopPropagation()}
+            >
+              <button
+                className="task-menu-btn"
+                onClick={() => setMenuOpen(o => !o)}
+                aria-label="Task options"
+              >
+                •••
+              </button>
+              {menuOpen && (
+                <div className="task-menu-dropdown">
+                  <button
+                    className="task-menu-item"
+                    onClick={() => { setMenuOpen(false); onEditTask(task.id) }}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    className="task-menu-item danger"
+                    onClick={() => { setMenuOpen(false); onDeleteTask(task.id) }}
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           <span className={`chevron${open ? ' open' : ''}`}>▾</span>
         </div>
       </div>

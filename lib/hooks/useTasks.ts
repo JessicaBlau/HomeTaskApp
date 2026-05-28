@@ -16,6 +16,7 @@ interface UseTasksReturn {
   loading:       boolean
   error:         string | null
   addTask:       (name: string, icon?: string, freq?: string, meta?: string) => Promise<void>
+  editTask:      (taskId: string, updates: { name?: string; icon?: string; freq?: string; meta?: string }) => Promise<void>
   deleteTask:    (taskId: string) => Promise<void>
   checkSubtask:  (subtaskId: string, checked: boolean) => Promise<void>
   addSubtask:    (taskId: string, text: string) => Promise<void>
@@ -173,6 +174,14 @@ export function useTasks(ownerId: OwnerFilter): UseTasksReturn {
     await (supabase.from('tasks') as any).insert(taskData)
   }, [supabase, ownerId, loadProfile])
 
+  const editTask = useCallback(async (
+    taskId: string,
+    updates: { name?: string; icon?: string; freq?: string; meta?: string },
+  ) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from('tasks') as any).update(updates).eq('id', taskId)
+  }, [supabase])
+
   const deleteTask = useCallback(async (taskId: string) => {
     await supabase.from('tasks').delete().eq('id', taskId)
   }, [supabase])
@@ -222,5 +231,5 @@ export function useTasks(ownerId: OwnerFilter): UseTasksReturn {
     await supabase.from('subtasks').delete().eq('id', subtaskId)
   }, [supabase])
 
-  return { tasks, loading, error, addTask, deleteTask, checkSubtask, addSubtask, editSubtask, deleteSubtask }
+  return { tasks, loading, error, addTask, editTask, deleteTask, checkSubtask, addSubtask, editSubtask, deleteSubtask }
 }
