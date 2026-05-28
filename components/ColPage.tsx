@@ -7,11 +7,12 @@ import { useTasks }                     from '@/lib/hooks/useTasks'
 import { useProfiles }                  from '@/lib/hooks/useProfiles'
 import { useCurrentProfile }            from '@/lib/hooks/useCurrentProfile'
 import { TaskCard }                     from '@/components/TaskCard'
+import { EditTaskModal }                from '@/components/EditTaskModal'
 import { AddTaskRow }                   from '@/components/AddTaskRow'
 import { ArcProgress }                  from '@/components/ArcProgress'
 import { OverviewStrip, LoadingScreen } from '@/components/Toast'
 import { useToast }                     from '@/components/Toast'
-import type { Profile, OwnerFilter }    from '@/lib/supabase/types'
+import type { Profile, OwnerFilter, TaskWithSubtasks } from '@/lib/supabase/types'
 
 // ── Derive header meta from owner slug + profile list ─────────
 function ownerMeta(owner: string, profileList: Profile[]) {
@@ -45,13 +46,15 @@ export function ColPage({ owner }: { owner: string }) {
 
   const {
     tasks, loading,
-    addTask, checkSubtask, addSubtask, editSubtask, deleteSubtask,
+    addTask, editTask, deleteTask,
+    checkSubtask, addSubtask, editSubtask, deleteSubtask,
   } = useTasks(ownerId)
 
-  const { showToast }                     = useToast()
-  const [profileMap, setProfileMap]       = useState<Record<string, string>>({})
-  const isAdult                           = currentProfile?.role === 'adult'
-  const meta                              = ownerMeta(owner, profileList)
+  const { showToast }                         = useToast()
+  const [profileMap, setProfileMap]           = useState<Record<string, string>>({})
+  const [editingTask, setEditingTask]         = useState<TaskWithSubtasks | null>(null)
+  const isAdult                               = currentProfile?.role === 'adult'
+  const meta                                  = ownerMeta(owner, profileList)
 
   // Build id→name map for subtask attribution display
   useEffect(() => {
@@ -92,6 +95,7 @@ export function ColPage({ owner }: { owner: string }) {
           color={ownerProfile?.color ?? meta.color}
           profiles={profileMap}
           currentUserId={currentProfile?.id ?? ''}
+          isAdult={isAdult}
           onCheck={(id, checked) => {
             checkSubtask(id, checked)
             showToast(checked ? '✅ Done!' : '↩️ Unchecked')
@@ -108,8 +112,23 @@ export function ColPage({ owner }: { owner: string }) {
             deleteSubtask(id)
             showToast('🗑️ Removed')
           }}
+          onEditTask={(id) => setEditingTask(tasks.find(t => t.id === id) ?? null)}
+          onDeleteTask={(id) => {
+            deleteTask(id)
+            showToast('🗑️ Task deleted')
+          }}
         />
       ))}
+
+      {/* Edit task modal */}
+      <EditTaskModal
+        task={editingTask}
+        onSave={(taskId, updates) => {
+          editTask(taskId, updates)
+          showToast('✏️ Task updated')
+        }}
+        onClose={() => setEditingTask(null)}
+      />
 
       {tasks.length === 0 && (
         <div style={{
