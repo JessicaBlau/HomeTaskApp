@@ -23,9 +23,9 @@ function ownerMeta(owner: string, profileList: Profile[]) {
   )
   const label = profile?.name ?? (owner.charAt(0).toUpperCase() + owner.slice(1))
   return {
-    icon:  label.charAt(0).toUpperCase(),
+    icon:  profile?.avatar_emoji ?? '🙂',
     label,
-    sub:   'Responsibilities',
+    sub:   'Tasks',
     color: profile?.color ?? '#8C7B6E',
   }
 }
