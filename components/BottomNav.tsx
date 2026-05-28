@@ -42,7 +42,7 @@ export function BottomNav() {
     ...profiles.map(p => ({
       key:   p.name.toLowerCase(),
       label: p.name,
-      icon:  p.name.charAt(0).toUpperCase(),
+      icon:  '',
       href:  `/${p.name.toLowerCase()}`,
       color: p.color,
     })),
@@ -102,7 +102,7 @@ export function BottomNav() {
               : undefined
             }
           >
-            <span className="nav-icon">{tab.icon}</span>
+            {tab.icon && <span className="nav-icon">{tab.icon}</span>}
             {tab.label}
           </button>
         ))}
